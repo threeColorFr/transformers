@@ -1527,10 +1527,11 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
     def get_input_embeddings(self):
         return self.shared
 
-    def set_input_embeddings(self, new_embeddings):
+    def set_input_embeddings(self, new_embeddings, set_decoder=False):
         self.shared = new_embeddings
         self.encoder.set_input_embeddings(new_embeddings)
-        self.decoder.set_input_embeddings(new_embeddings)
+        if set_decoder:
+            self.decoder.set_input_embeddings(new_embeddings)
 
     def set_output_embeddings(self, new_embeddings):
         self.lm_head = new_embeddings
