@@ -910,6 +910,7 @@ class T5Stack(T5PreTrainedModel):
         output_attentions=None,
         output_hidden_states=None,
         return_dict=None,
+        types=None,
     ):
         # Model parallel
         if self.model_parallel:
@@ -938,7 +939,10 @@ class T5Stack(T5PreTrainedModel):
 
         if inputs_embeds is None:
             assert self.embed_tokens is not None, "You have to initialize the model with valid token embeddings"
-            inputs_embeds = self.embed_tokens(input_ids)
+            if type(self.embed_tokens) == nn.Embedding:
+                inputs_embeds = self.embed_tokens(input_ids)
+            else:
+                inputs_embeds = self.embed_tokens(input_ids, types)
 
         batch_size, seq_length = input_shape
 
@@ -1565,6 +1569,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
         output_attentions: Optional[bool] = None,
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
+        types: Optional[torch.LongTensor] = None,
     ) -> Union[Tuple[torch.FloatTensor], Seq2SeqLMOutput]:
         r"""
         labels (`torch.LongTensor` of shape `(batch_size,)`, *optional*):
@@ -1617,6 +1622,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                 output_attentions=output_attentions,
                 output_hidden_states=output_hidden_states,
                 return_dict=return_dict,
+                types=types,
             )
         elif return_dict and not isinstance(encoder_outputs, BaseModelOutput):
             encoder_outputs = BaseModelOutput(
