@@ -1533,9 +1533,11 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
 
     def set_input_embeddings(self, new_embeddings, set_decoder=False):
         self.shared = new_embeddings
-        self.encoder.set_input_embeddings(new_embeddings)
+        self.encoder.set_input_embeddings(self.shared)
         if set_decoder:
-            self.decoder.set_input_embeddings(new_embeddings)
+            self.decoder.set_input_embeddings(self.shared)
+        else:
+            self.decoder.embed_tokens = self.shared.wte
 
     def set_output_embeddings(self, new_embeddings):
         self.lm_head = new_embeddings
